@@ -2,6 +2,8 @@
 
 Working examples demonstrating how to use OpenDataLoader PDF in RAG (Retrieval-Augmented Generation) pipelines.
 
+Benchmark-backed guidance: prefer Markdown or JSON+Markdown output, keep structure tags on when available, and merge consecutive page requests into a single range before calling convert().
+
 ## Prerequisites
 
 - Python 3.10+
@@ -28,6 +30,7 @@ Examples use `samples/pdf/1901.03003.pdf` - a multi-page academic paper (arXiv:1
   2. By section (grouped under headings)
   3. Merged chunks (minimum size threshold)
 - Bounding box metadata for citations
+- Page-range compression for partial document processing
 
 **Run:**
 ```bash
@@ -43,6 +46,7 @@ python basic_chunking.py
 - OpenDataLoaderPDFLoader usage
 - Returns LangChain Document objects
 - Ready for any LangChain pipeline
+- Markdown-first output and tagged-PDF structure when available
 
 **Run:**
 ```bash

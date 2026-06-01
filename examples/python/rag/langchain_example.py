@@ -8,14 +8,29 @@ for seamless RAG pipeline integration.
 Usage:
     pip install langchain-opendataloader-pdf
     python langchain_example.py
+    python langchain_example.py --no-use-struct-tree
 """
 
+import argparse
 from pathlib import Path
 
 from langchain_opendataloader_pdf import OpenDataLoaderPDFLoader
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Show LangChain integration with benchmark-aware defaults.")
+    parser.add_argument(
+        "--no-use-struct-tree",
+        action="store_false",
+        dest="use_struct_tree",
+        help="Disable tagged-PDF structure if you need heuristic reading order only.",
+    )
+    parser.set_defaults(use_struct_tree=True)
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     # Find sample PDF relative to this script
     # Using 1901.03003.pdf - a multi-page academic paper with complex layout
     script_dir = Path(__file__).resolve().parent
@@ -33,7 +48,8 @@ def main():
     # Create loader with LangChain integration
     loader = OpenDataLoaderPDFLoader(
         file_path=[str(sample_pdf)],
-        format="text",
+        format="markdown",
+        use_struct_tree=args.use_struct_tree,
         quiet=True,
     )
 

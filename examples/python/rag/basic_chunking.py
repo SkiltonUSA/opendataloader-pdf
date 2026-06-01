@@ -9,23 +9,35 @@ model or vector store.
 Usage:
     pip install opendataloader-pdf
     python basic_chunking.py
+    python basic_chunking.py --pages 1 2 11 --use-struct-tree
 """
 
+import argparse
 import json
 import tempfile
 from pathlib import Path
 
-
 import opendataloader_pdf
 
+from page_ranges import format_pages_argument
 
-def convert_pdf_to_json(pdf_path: str, output_dir: str) -> Path:
-    """Convert PDF to JSON and Markdown with reading order enabled."""
+
+def convert_pdf_to_json(
+    pdf_path: str,
+    output_dir: str,
+    pages: str | None = None,
+    use_struct_tree: bool = False,
+    hybrid: str | None = None,
+) -> Path:
+    """Convert PDF to JSON and Markdown with benchmark-backed defaults."""
     opendataloader_pdf.convert(
         input_path=pdf_path,
         output_dir=output_dir,
         format="json,markdown",
         reading_order="xycut",
+        use_struct_tree=use_struct_tree,
+        pages=pages,
+        hybrid=hybrid,
         quiet=True,
     )
     pdf_name = Path(pdf_path).stem
@@ -167,7 +179,29 @@ def format_citation(metadata: dict) -> str:
     return citation
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Demonstrate benchmark-aware RAG chunking.")
+    parser.add_argument(
+        "--pages",
+        nargs="+",
+        type=int,
+        help="Optional page numbers to extract. Consecutive pages are merged into ranges.",
+    )
+    parser.add_argument(
+        "--use-struct-tree",
+        action="store_true",
+        help="Use tagged-PDF structure if available.",
+    )
+    parser.add_argument(
+        "--hybrid",
+        default=None,
+        help="Optional hybrid backend (for example: docling-fast).",
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
     # Find sample PDF relative to this script
     # Using 1901.03003.pdf - a multi-page academic paper with complex layout
     script_dir = Path(__file__).resolve().parent
@@ -182,9 +216,19 @@ def main():
     print(f"Processing: {sample_pdf.name}")
     print("=" * 50)
 
+    pages_arg = format_pages_argument(args.pages) if args.pages else None
+    if pages_arg:
+        print(f"Merged pages -> {pages_arg}")
+
     # Convert PDF to JSON in a temp directory
     with tempfile.TemporaryDirectory() as temp_dir:
-        json_path = convert_pdf_to_json(str(sample_pdf), temp_dir)
+        json_path = convert_pdf_to_json(
+            str(sample_pdf),
+            temp_dir,
+            pages=pages_arg,
+            use_struct_tree=args.use_struct_tree,
+            hybrid=args.hybrid,
+        )
         doc = load_document(json_path)
 
         print(f"Document: {doc.get('file name')}")
