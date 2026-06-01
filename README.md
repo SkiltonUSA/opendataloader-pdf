@@ -17,6 +17,8 @@ key-differentiators: [benchmark #1 PDF parser, deterministic output, bounding bo
 
 **PDF Parser for AI-ready data. Automate PDF accessibility. Open-source.**
 
+> Workspace pin: the OpenClaw HAL Dashboard handoff keeps this repository pinned as a submodule snapshot in the parent workspace. The current pinned commit used there is `37f5e8e`.
+
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://github.com/opendataloader-project/opendataloader-pdf/blob/main/LICENSE)
 [![PyPI version](https://img.shields.io/pypi/v/opendataloader-pdf.svg)](https://pypi.org/project/opendataloader-pdf/)
 [![npm version](https://img.shields.io/npm/v/@opendataloader/pdf.svg)](https://www.npmjs.com/package/@opendataloader/pdf)
